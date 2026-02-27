@@ -21,7 +21,7 @@ Email management and automation with attachment support.
 
 ### 1. Configure Email Credentials
 
-Create a configuration file at `D:\clawd_workspace\email_config.json`:
+Create a configuration file `email_config.json` in your workspace:
 
 ```json
 {
@@ -83,7 +83,7 @@ python email_sender.py --to "your-email@gmail.com" --test
 
 ### Using with OpenClaw Commands
 ```
-"Send email to alan@example.com with subject Meeting Notes and body Here are the notes from today's meeting"
+"Send email to recipient@example.com with subject Meeting Notes and body Here are the notes from today's meeting"
 "Send test email to verify configuration"
 "Email the report.pdf file to team@company.com"
 ```
@@ -104,7 +104,7 @@ python email_sender.py --to "your-email@gmail.com" --test
 from email_sender import EmailSender
 
 # Initialize with config file
-sender = EmailSender("D:\clawd_workspace\email_config.json")
+sender = EmailSender("email_config.json")
 
 # Send email with attachment
 result = sender.send_email(

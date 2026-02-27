@@ -4,7 +4,7 @@ This document explains how to use the email skill from within OpenClaw sessions.
 
 ## Prerequisites
 
-1. Email configuration file created at `D:\clawd_workspace\email_config.json`
+1. Email configuration file created (e.g., `email_config.json` in your workspace)
 2. Python installed and accessible
 3. Email skill enabled in OpenClaw config
 
@@ -17,16 +17,24 @@ You can call the email sender directly from OpenClaw:
 ```python
 # In an OpenClaw session
 import sys
-sys.path.append('D:\\clawd_workspace\\skills\\email')
+import os
+
+# Add email skill to path (adjust path as needed)
+email_skill_path = os.path.join(os.getcwd(), 'skills', 'email')
+if email_skill_path not in sys.path:
+    sys.path.append(email_skill_path)
+
 from email_sender import EmailSender
 
-sender = EmailSender('D:\\clawd_workspace\\email_config.json')
+# Initialize with config file (adjust path as needed)
+config_path = 'email_config.json'  # Or full path to your config
+sender = EmailSender(config_path)
 
 result = sender.send_email(
     to_email='recipient@example.com',
     subject='Test from OpenClaw',
     body='This email was sent from OpenClaw!',
-    attachments=['D:\\clawd_workspace\\report.pdf']
+    attachments=['report.pdf']  # Relative or absolute paths
 )
 
 if result['success']:
@@ -40,11 +48,12 @@ else:
 You can use OpenClaw's `exec` tool to run the email sender:
 
 ```bash
-# Send a simple email
-python D:\clawd_workspace\skills\email\email_sender.py --to "recipient@example.com" --subject "Hello" --body "Message from OpenClaw"
+# Send a simple email (from the email skill directory)
+cd /path/to/openclaw-email-skill
+python email_sender.py --to "recipient@example.com" --subject "Hello" --body "Message from OpenClaw"
 
-# Send email with attachment
-python D:\clawd_workspace\skills\email\email_sender.py --to "recipient@example.com" --subject "Report" --body "Please review" --attachment "D:\clawd_workspace\report.pdf"
+# Send email with attachment (using absolute or relative paths)
+python email_sender.py --to "recipient@example.com" --subject "Report" --body "Please review" --attachment "report.pdf"
 ```
 
 ### Method 3: Create Custom Commands
@@ -68,7 +77,7 @@ Here's a complete function you can add to your OpenClaw setup:
 import os
 import sys
 
-def send_email_from_openclaw(to_email, subject, body, attachments=None):
+def send_email_from_openclaw(to_email, subject, body, attachments=None, config_path=None):
     """
     Send email from within OpenClaw
     
@@ -77,16 +86,21 @@ def send_email_from_openclaw(to_email, subject, body, attachments=None):
         subject: Email subject
         body: Email body text
         attachments: List of file paths (optional)
+        config_path: Path to email config file (optional)
     """
+    # Determine config path
+    if config_path is None:
+        config_path = os.path.join(os.getcwd(), 'email_config.json')
+    
     # Add email skill to path
-    email_skill_path = 'D:\\clawd_workspace\\skills\\email'
-    if email_skill_path not in sys.path:
-        sys.path.append(email_skill_path)
+    email_skill_dir = os.path.dirname(os.path.abspath(__file__))
+    if email_skill_dir not in sys.path:
+        sys.path.append(email_skill_dir)
     
     try:
         from email_sender import EmailSender
         
-        sender = EmailSender('D:\\clawd_workspace\\email_config.json')
+        sender = EmailSender(config_path)
         
         result = sender.send_email(
             to_email=to_email,
@@ -105,10 +119,10 @@ def send_email_from_openclaw(to_email, subject, body, attachments=None):
 
 # Example usage in OpenClaw:
 # result = send_email_from_openclaw(
-#     to_email='alan@example.com',
+#     to_email='recipient@example.com',
 #     subject='Daily Report',
 #     body='Here is your daily report.',
-#     attachments=['D:\\clawd_workspace\\daily_report.pdf']
+#     attachments=['daily_report.pdf']
 # )
 ```
 
@@ -117,7 +131,7 @@ def send_email_from_openclaw(to_email, subject, body, attachments=None):
 ### 1. Sending Reports
 ```python
 # After generating a report
-report_path = 'D:\\clawd_workspace\\generated_report.pdf'
+report_path = 'generated_report.pdf'
 send_email_from_openclaw(
     to_email='team@company.com',
     subject='Daily Analytics Report',
@@ -140,9 +154,9 @@ send_email_from_openclaw(
 ```python
 # Send multiple files
 attachments = [
-    'D:\\clawd_workspace\\data.csv',
-    'D:\\clawd_workspace\\chart.png',
-    'D:\\clawd_workspace\\summary.docx'
+    'data.csv',
+    'chart.png',
+    'summary.docx'
 ]
 
 send_email_from_openclaw(
@@ -156,10 +170,10 @@ send_email_from_openclaw(
 ## Error Handling
 
 ```python
-def safe_send_email(to_email, subject, body, attachments=None):
+def safe_send_email(to_email, subject, body, attachments=None, config_path=None):
     """Send email with error handling"""
     try:
-        result = send_email_from_openclaw(to_email, subject, body, attachments)
+        result = send_email_from_openclaw(to_email, subject, body, attachments, config_path)
         
         if result['success']:
             return f"✅ Email sent to {to_email} with {len(attachments or [])} attachments"
@@ -176,12 +190,13 @@ Always test your configuration first:
 
 ```python
 # Test function
-def test_email_config():
+def test_email_config(config_path=None):
     """Test email configuration"""
     result = send_email_from_openclaw(
         to_email='your-email@gmail.com',  # Send to yourself
         subject='OpenClaw Email Test',
-        body='If you receive this, email configuration is working!'
+        body='If you receive this, email configuration is working!',
+        config_path=config_path
     )
     
     if result['success']:

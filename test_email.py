@@ -15,12 +15,18 @@ def main():
     print("Testing Email Configuration")
     print("=" * 50)
     
-    # Check for config file
-    config_path = "D:\\clawd_workspace\\email_config.json"
+    # Check for config file argument
+    config_path = "email_config.json"
+    if len(sys.argv) > 1:
+        config_path = sys.argv[1]
+    
     if not os.path.exists(config_path):
         print(f"[ERROR] Config file not found: {config_path}")
         print("\nPlease create the config file with your email credentials.")
         print("Template is available at: config_template.json")
+        print("\nUsage: python test_email.py [config_file_path]")
+        print("Example: python test_email.py email_config.json")
+        print("Example: python test_email.py /path/to/your/config.json")
         return
     
     print(f"[OK] Config file found: {config_path}")

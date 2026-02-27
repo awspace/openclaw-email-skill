@@ -72,7 +72,7 @@ python email_sender.py --to "your-email@gmail.com" --test
 When installed as an OpenClaw skill, you can use natural language commands:
 
 ```
-"Send email to alan@example.com with subject Meeting Notes and body Here are the notes from today's meeting"
+"Send email to recipient@example.com with subject Meeting Notes and body Here are the notes from today's meeting"
 "Send test email to verify configuration"
 "Email the report.pdf file to team@company.com"
 ```
